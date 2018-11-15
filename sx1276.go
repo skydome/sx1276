@@ -73,7 +73,7 @@ const (
 )
 
 const (
-	RST = "GPIO_22"
+	RST = "GPIO_7"
 )
 
 type SX1276 struct {
@@ -195,33 +195,33 @@ func NewSX1276() (sx *SX1276, err error) {
 	sx.WriteReg(RegOpMode, 0x88)
 
 	// Setup DIO interrrupts.
-	if sx.DIO0, err = NewIntPin("DIO0", "GPIO_12"); err != nil {
+	if sx.DIO0, err = NewIntPin("DIO0", "GPIO_22"); err != nil {
 		return nil, err
 	}
-	if sx.DIO1, err = NewIntPin("DIO1", "GPIO_6"); err != nil {
+	if sx.DIO1, err = NewIntPin("DIO1", "GPIO_23"); err != nil {
 		return nil, err
 	}
-	if sx.DIO2, err = NewIntPin("DIO2", "GPIO_5"); err != nil {
+	if sx.DIO2, err = NewIntPin("DIO2", "GPIO_24"); err != nil {
 		return nil, err
 	}
-	if sx.DIO3, err = NewIntPin("DIO3", "GPIO_16"); err != nil {
+	if sx.DIO3, err = NewIntPin("DIO3", "GPIO_25"); err != nil {
 		return nil, err
 	}
-	if sx.DIO4, err = NewIntPin("DIO4", "GPIO_13"); err != nil {
-		return nil, err
-	}
-	if sx.DIO5, err = NewIntPin("DIO5", "GPIO_27"); err != nil {
-		return nil, err
-	}
+	// if sx.DIO4, err = NewIntPin("DIO4", "GPIO_5"); err != nil {
+	// 	return nil, err
+	// }
+	// if sx.DIO5, err = NewIntPin("DIO5", "GPIO_6"); err != nil {
+	// 	return nil, err
+	// }
 
 	// Set default frequency.
-	err = sx.SetFrequency(904500000)
+	err = sx.SetFrequency(868000000)
 	if err != nil {
 		return nil, err
 	}
 
 	// Set maximum payload length and configure output power.
-	sx.WriteReg(RegMaxPayloadLength, 0x80)
+	sx.WriteReg(RegMaxPayloadLength, 0x40)
 	sx.WriteReg(RegPaConfig, 0xCF)
 
 	return
@@ -233,8 +233,8 @@ func (sx SX1276) Close() {
 	sx.DIO1.Close()
 	sx.DIO2.Close()
 	sx.DIO3.Close()
-	sx.DIO4.Close()
-	sx.DIO5.Close()
+	//sx.DIO4.Close()
+	//sx.DIO5.Close()
 
 	sx.rst.Close()
 	embd.CloseGPIO()
@@ -314,11 +314,11 @@ func (sx SX1276) SetOpMode(mode OpMode) error {
 		return errors.New("invalid operating mode")
 	}
 
-	go sx.DIO5.Latch()
-	sx.DIO5.Unlatch()
+	// go sx.DIO5.Latch()
+	// sx.DIO5.Unlatch()
 	val := sx.ReadReg(RegOpMode)
 	sx.WriteReg(RegOpMode, (val&0xF8)|byte(mode))
-	sx.DIO5.Unlatch()
+	// sx.DIO5.Unlatch()
 
 	return nil
 }
@@ -526,6 +526,23 @@ func (sx *SX1276) StartRxContinuous() (pkts chan []byte) {
 	}()
 
 	return
+}
+
+func (sx *SX1276) StartRxSingle(timeout time.Duration) ([]byte, error) {
+	sx.WriteReg(RegDioMapping1, 0x00)
+	sx.SetOpMode(RXCONTINUOUS)
+	select {
+	case <-sx.DIO0.Irq:
+		sx.WriteReg(RegIrqFlags, 0x40)
+		if pkt, err := sx.rx(); err != nil {
+			return nil, err
+		} else {
+			return pkt, nil
+		}
+	case <-time.After(timeout):
+		return nil, errors.New("timeout")
+
+	}
 }
 
 // Stop continuous reception.
