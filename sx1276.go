@@ -68,7 +68,7 @@ const (
 )
 
 const (
-	FifoTxBaseAddr = 0x02
+	FifoTxBaseAddr = 0x80
 	FifoRxBaseAddr = 0x0A
 )
 
@@ -458,9 +458,8 @@ func (sx SX1276) LastPktPower() float64 {
 	return sx.LastPktRSSI() + sx.LastPktSNR()
 }
 
-// Transmit payload. This method assumes the transceiver's operating mode is
-// either SLEEP or STDBY.
 func (sx SX1276) Tx(payload []byte) {
+	sx.SetOpMode(STDBY)                               // put device into STDBY for writing into tx fifo
 	sx.WriteReg(RegDioMapping1, 0x40)                 // Enable TxDone interrupt on DIO0.
 	sx.WriteReg(RegFifoAddrPtr, FifoTxBaseAddr)       // Set the FIFO's starting address.
 	sx.WriteReg(RegPayloadLength, byte(len(payload))) // Set the number of bytes to be transmitted.
