@@ -2,10 +2,10 @@ package sx1276
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"time"
 
+	"fmt"
 	"github.com/kidoman/embd"
 	_ "github.com/kidoman/embd/host/rpi"
 )
@@ -459,7 +459,8 @@ func (sx SX1276) LastPktPower() float64 {
 }
 
 func (sx SX1276) Tx(payload []byte) {
-	sx.SetOpMode(STDBY)                               // put device into STDBY for writing into tx fifo
+	sx.SetOpMode(STDBY) // put device into STDBY for writing into tx fifo
+	time.Sleep(10 * time.Millisecond)
 	sx.WriteReg(RegDioMapping1, 0x40)                 // Enable TxDone interrupt on DIO0.
 	sx.WriteReg(RegFifoAddrPtr, FifoTxBaseAddr)       // Set the FIFO's starting address.
 	sx.WriteReg(RegPayloadLength, byte(len(payload))) // Set the number of bytes to be transmitted.
@@ -540,7 +541,6 @@ func (sx *SX1276) StartRxSingle(timeout time.Duration) ([]byte, error) {
 		}
 	case <-time.After(timeout):
 		return nil, errors.New("timeout")
-
 	}
 }
 
