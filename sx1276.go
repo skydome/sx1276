@@ -222,9 +222,6 @@ func NewSX1276() (sx *SX1276, err error) {
 
 	// Set maximum payload length and configure output power.
 	sx.WriteReg(RegMaxPayloadLength, 0x40)
-	sx.WriteReg(RegPaConfig, 0xFF)
-	sx.WriteReg(RegPaDac, 0x87)
-	sx.WriteReg(RegLna, 0x23)
 
 	return
 }
@@ -463,6 +460,13 @@ func (sx SX1276) LastPktPower() float64 {
 func (sx SX1276) Tx(payload []byte) {
 	sx.SetOpMode(STDBY) // put device into STDBY for writing into tx fifo
 	// time.Sleep(10 * time.Millisecond)
+
+	// BEGIN LNA + PA config for TX
+	sx.WriteReg(RegLna, 0x20)
+	sx.WriteReg(RegPaConfig, 0xFF)
+	sx.WriteReg(RegPaDac, 0x87)
+	// END LNA + PA config for TX
+
 	sx.WriteReg(RegDioMapping1, 0x40)                 // Enable TxDone interrupt on DIO0.
 	sx.WriteReg(RegFifoAddrPtr, FifoTxBaseAddr)       // Set the FIFO's starting address.
 	sx.WriteReg(RegPayloadLength, byte(len(payload))) // Set the number of bytes to be transmitted.
@@ -538,6 +542,13 @@ func (sx *SX1276) StartRxContinuous() (pkts chan []byte) {
 func (sx *SX1276) StartRxSingle(timeout time.Duration) ([]byte, error) {
 	sx.WriteReg(RegDioMapping1, 0x00)
 	sx.SetOpMode(RXCONTINUOUS)
+
+	// BEGIN LNA + PA settings for RX
+	sx.WriteReg(RegPaConfig, 0x00)
+	sx.WriteReg(RegPaDac, 0x84)
+	sx.WriteReg(RegLna, 0x23)
+	// END LNA + PA settings for RX
+
 	select {
 	case <-sx.DIO0.Irq:
 		sx.WriteReg(RegIrqFlags, 0x40)
