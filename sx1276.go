@@ -460,7 +460,7 @@ func (sx SX1276) LastPktPower() float64 {
 
 func (sx SX1276) Tx(payload []byte) {
 	sx.SetOpMode(STDBY) // put device into STDBY for writing into tx fifo
-	time.Sleep(10 * time.Millisecond)
+	// time.Sleep(10 * time.Millisecond)
 	sx.WriteReg(RegDioMapping1, 0x40)                 // Enable TxDone interrupt on DIO0.
 	sx.WriteReg(RegFifoAddrPtr, FifoTxBaseAddr)       // Set the FIFO's starting address.
 	sx.WriteReg(RegPayloadLength, byte(len(payload))) // Set the number of bytes to be transmitted.
