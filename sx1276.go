@@ -517,6 +517,11 @@ func (sx *SX1276) StartRxContinuous() (pkts chan []byte) {
 				if pkt, err := sx.rx(); err != nil {
 					log.Println(err)
 				} else {
+					rssi := sx.LastPktRSSI()
+					snr := sx.LastPktSNR()
+					dBm := sx.LastPktPower()
+					fmt.Println()
+					fmt.Printf("RSSI: %0.0f SNR: %0.1f dBm: %0.1f\n", rssi, snr, dBm)
 					pkts <- pkt
 				}
 			case <-sx.stopRxContinuous:
@@ -537,6 +542,11 @@ func (sx *SX1276) StartRxSingle(timeout time.Duration) ([]byte, error) {
 		if pkt, err := sx.rx(); err != nil {
 			return nil, err
 		} else {
+			rssi := sx.LastPktRSSI()
+			snr := sx.LastPktSNR()
+			dBm := sx.LastPktPower()
+			fmt.Println()
+			fmt.Printf("RSSI: %0.0f SNR: %0.1f dBm: %0.1f\n", rssi, snr, dBm)
 			return pkt, nil
 		}
 	case <-time.After(timeout):
