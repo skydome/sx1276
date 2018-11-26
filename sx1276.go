@@ -67,6 +67,9 @@ const (
 	RegPll                 = 0x70 // Control of the PLL bandwidth
 )
 
+const RxError = "RxError"
+const RxTimeout = "RxTimeout"
+
 const (
 	FifoTxBaseAddr = 0x80
 	FifoRxBaseAddr = 0x0A
@@ -484,7 +487,7 @@ func (sx SX1276) rx() ([]byte, error) {
 	// return an error.
 	if irqFlags&0x20 == 0x20 {
 		sx.WriteReg(RegIrqFlags, 0x20)
-		return nil, errors.New("bad crc")
+		return nil, errors.New(RxError)
 	}
 
 	rxAddr := sx.ReadReg(RegFifoRxCurrentAddr)        // Get the current Rx FIFO starting address.
@@ -563,7 +566,7 @@ func (sx *SX1276) StartRxSingle(timeout time.Duration) ([]byte, error) {
 			return pkt, nil
 		}
 	case <-time.After(timeout):
-		return nil, errors.New("timeout")
+		return nil, errors.New(RxTimeout)
 	}
 }
 
