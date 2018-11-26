@@ -222,7 +222,7 @@ func NewSX1276() (sx *SX1276, err error) {
 
 	// Set maximum payload length and configure output power.
 	sx.WriteReg(RegMaxPayloadLength, 0x40)
-	sx.WriteReg(RegPaConfig, 0xCF)
+	sx.WriteReg(RegPaConfig, 0xFF)
 	sx.WriteReg(RegPaDac, 0x87)
 	sx.WriteReg(RegLna, 0x23)
 
