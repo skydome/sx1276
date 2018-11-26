@@ -450,7 +450,11 @@ func (sx SX1276) LastPktRSSI() float64 {
 
 func (sx SX1276) LastPktSNR() float64 {
 	snr := sx.ReadReg(RegPktSnrValue)
-	return (float64(snr) - 127) / 4.0
+	if (snr & 0x80) == 1 {
+		return float64((^snr+1)&0xFF) / 4.0
+	} else {
+		return (float64(snr) - 0xFF) / 4.0
+	}
 }
 
 func (sx SX1276) LastPktPower() float64 {
