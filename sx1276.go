@@ -92,6 +92,29 @@ type SX1276 struct {
 	DIO5 InterruptPin
 
 	stopRxContinuous chan struct{}
+
+	SX1276Error
+}
+
+type SX1276Error struct {
+	Err       string
+	IsCRC     bool
+	IsTimeout bool
+}
+
+func (s *SX1276Error) Error() string {
+	if s == nil {
+		return "<nil>"
+	}
+	return "sx1276" + s.Err
+}
+
+func (s *SX1276Error) Timeout() bool {
+	return s.IsTimeout
+}
+
+func (s *SX1276Error) CRC() bool {
+	return s.IsCRC
 }
 
 type InterruptPin struct {
