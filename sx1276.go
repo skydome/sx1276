@@ -73,7 +73,7 @@ const (
 )
 
 const (
-	RST = "GPIO_7"
+	RST = "GPIO_5"
 )
 
 type SX1276 struct {
@@ -207,12 +207,12 @@ func NewSX1276() (sx *SX1276, err error) {
 	if sx.DIO3, err = NewIntPin("DIO3", "GPIO_25"); err != nil {
 		return nil, err
 	}
-	// if sx.DIO4, err = NewIntPin("DIO4", "GPIO_5"); err != nil {
-	// 	return nil, err
-	// }
-	// if sx.DIO5, err = NewIntPin("DIO5", "GPIO_6"); err != nil {
-	// 	return nil, err
-	// }
+	if sx.DIO4, err = NewIntPin("DIO4", "GPIO_19"); err != nil {
+		return nil, err
+	}
+	if sx.DIO5, err = NewIntPin("DIO5", "GPIO_26"); err != nil {
+		return nil, err
+	}
 
 	// Set default frequency.
 	err = sx.SetFrequency(868000000)
@@ -233,8 +233,8 @@ func (sx SX1276) Close() {
 	sx.DIO1.Close()
 	sx.DIO2.Close()
 	sx.DIO3.Close()
-	//sx.DIO4.Close()
-	//sx.DIO5.Close()
+	sx.DIO4.Close()
+	sx.DIO5.Close()
 
 	sx.rst.Close()
 	embd.CloseGPIO()
@@ -314,11 +314,11 @@ func (sx SX1276) SetOpMode(mode OpMode) error {
 		return errors.New("invalid operating mode")
 	}
 
-	// go sx.DIO5.Latch()
-	// sx.DIO5.Unlatch()
+	go sx.DIO5.Latch()
+	sx.DIO5.Unlatch()
 	val := sx.ReadReg(RegOpMode)
 	sx.WriteReg(RegOpMode, (val&0xF8)|byte(mode))
-	// sx.DIO5.Unlatch()
+	sx.DIO5.Unlatch()
 
 	return nil
 }
