@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"errors"
 	"fmt"
 	"github.com/kidoman/embd"
 	_ "github.com/kidoman/embd/host/rpi"
