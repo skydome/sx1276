@@ -482,7 +482,7 @@ func (sx SX1276) LastPktPower() float64 {
 
 func (sx SX1276) Tx(payload []byte) {
 	sx.SetOpMode(STDBY) // put device into STDBY for writing into tx fifo
-	// time.Sleep(10 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	// BEGIN LNA + PA config for TX
 	// sx.WriteReg(RegLna, 0x20)
