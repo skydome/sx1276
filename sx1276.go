@@ -1,7 +1,6 @@
 package sx1276
 
 import (
-	"errors"
 	"log"
 	"time"
 
@@ -66,9 +65,6 @@ const (
 	RegAgcThresh3          = 0x64 // Adjustment of the AGC thresholds
 	RegPll                 = 0x70 // Control of the PLL bandwidth
 )
-
-const RxError = "RxError"
-const RxTimeout = "RxTimeout"
 
 const (
 	FifoTxBaseAddr = 0x80
@@ -510,7 +506,7 @@ func (sx SX1276) rx() ([]byte, error) {
 	// return an error.
 	if irqFlags&0x20 == 0x20 {
 		sx.WriteReg(RegIrqFlags, 0x20)
-		return nil, errors.New(RxError)
+		return nil, &SX1276Error{Err: "sx1276 rx crc failed", IsCRC: true}
 	}
 
 	rxAddr := sx.ReadReg(RegFifoRxCurrentAddr)        // Get the current Rx FIFO starting address.
@@ -589,7 +585,7 @@ func (sx *SX1276) StartRxSingle(timeout time.Duration) ([]byte, error) {
 			return pkt, nil
 		}
 	case <-time.After(timeout):
-		return nil, errors.New(RxTimeout)
+		return nil, &SX1276Error{Err: "sx1276 rx timeout", IsTimeout: true}
 	}
 }
 
