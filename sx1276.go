@@ -489,9 +489,9 @@ func (sx SX1276) Tx(payload []byte) {
 	// time.Sleep(10 * time.Millisecond)
 
 	// BEGIN LNA + PA config for TX
-	// sx.WriteReg(RegLna, 0x20)
-	// sx.WriteReg(RegPaConfig, 0xFF)
-	// sx.WriteReg(RegPaDac, 0x87)
+	sx.WriteReg(RegLna, 0x20)
+	sx.WriteReg(RegPaConfig, 0xFF)
+	sx.WriteReg(RegPaDac, 0x87)
 	// END LNA + PA config for TX
 
 	sx.WriteReg(RegDioMapping1, 0x40)                 // Enable TxDone interrupt on DIO0.
@@ -571,9 +571,9 @@ func (sx *SX1276) StartRxSingle(timeout time.Duration) ([]byte, error) {
 	sx.SetOpMode(RXCONTINUOUS)
 
 	// BEGIN LNA + PA settings for RX
-	// sx.WriteReg(RegPaConfig, 0x00)
-	// sx.WriteReg(RegPaDac, 0x84)
-	// sx.WriteReg(RegLna, 0x23)
+	sx.WriteReg(RegPaConfig, 0x00)
+	sx.WriteReg(RegPaDac, 0x84)
+	sx.WriteReg(RegLna, 0x23)
 	// END LNA + PA settings for RX
 
 	select {
