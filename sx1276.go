@@ -248,8 +248,8 @@ func NewSX1276() (sx *SX1276, err error) {
 	sx.WriteReg(RegMaxPayloadLength, 0x40)
 
 	sx.WriteReg(RegLna, 0x23)
-	// sx.WriteReg(RegPaConfig, 0xFF)
-	// sx.WriteReg(RegPaDac, 0x87)
+	sx.WriteReg(RegPaConfig, 0xFF)
+	sx.WriteReg(RegPaDac, 0x87)
 	return
 }
 
